@@ -31,7 +31,6 @@ void hmem_arena_reset(hmem_arena_t *arena);
 #endif /* HMEM_ARENA_H */
 
 
-#define HMEM_IMPLEMENTATION // temporary for prog
 #if defined(HMEM_IMPLEMENTATION) && !defined(HMEM_ARENA_IMPLEMENTATION)
 #define HMEM_ARENA_IMPLEMENTATION
 
