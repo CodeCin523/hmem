@@ -30,7 +30,7 @@ void hmem_teardown_page(hmem_page_t *page);
 bool hmem_setup_book(hmem_book_t *book, uint8_t capacity);
 void hmem_teardown_book(hmem_book_t *book);
 
-void hmem_book_push(hmem_book_t *book, hmem_page_t *page);
+bool hmem_book_push(hmem_book_t *book, hmem_page_t *page);
 bool hmem_book_pop(hmem_book_t *book, hmem_page_t *outPage);
 
 
@@ -41,7 +41,6 @@ bool hmem_book_pop(hmem_book_t *book, hmem_page_t *outPage);
 #endif /* HMEM_BOOK_H */
 
 
-#define HMEM_IMPLEMENTATION
 #if defined(HMEM_IMPLEMENTATION) && !defined(HMEM_BOOK_IMPLEMENTATION)
 #define HMEM_BOOK_IMPLEMENTATION
 
@@ -91,11 +90,11 @@ void hmem_teardown_book(hmem_book_t *book) {
     book->capacity = 0;
 }
 
-void hmem_book_push(hmem_book_t *book, hmem_page_t *page) {
-    HMEM_CHECK_ARGS(book && page, /*void*/);
+bool hmem_book_push(hmem_book_t *book, hmem_page_t *page) {
+    HMEM_CHECK_ARGS(book && page, false);
     
     if(book->current >= book->capacity) {
-        HMEM_CHECK_STATE(book->capacity < UINT8_MAX, /*void*/);
+        HMEM_CHECK_STATE(book->capacity < UINT8_MAX, false);
 
         void *npages = NULL;
         size_t nsize = (size_t)book->capacity * 2;
@@ -103,13 +102,14 @@ void hmem_book_push(hmem_book_t *book, hmem_page_t *page) {
             nsize = UINT8_MAX;
 
         npages = realloc(book->pages, nsize * sizeof(hmem_page_t));
-        HMEM_CHECK_ALLOC(npages, /*void*/);
+        HMEM_CHECK_ALLOC(npages, false);
 
         book->pages = npages;
         book->capacity = nsize;
     }
 
     book->pages[book->current++] = *page;
+    return true;
 }
 bool hmem_book_pop(hmem_book_t *book, hmem_page_t *outPage) {
     HMEM_CHECK_ARGS(book, false);
