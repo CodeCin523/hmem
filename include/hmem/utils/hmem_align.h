@@ -9,13 +9,14 @@ extern "C" {
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 
 /**
  * Check if a value is a power-of-2 (>0).
  * Returns 1 if true, 0 otherwise.
  */
-static inline int hmem_is_pow2(uintptr_t v) {
+static inline bool hmem_is_pow2(uintptr_t v) {
     return v != 0 && (v & (v - 1)) == 0;
 }
 
@@ -24,7 +25,7 @@ static inline int hmem_is_pow2(uintptr_t v) {
  * Returns 1 if true, 0 otherwise.
  * `align` must be a power of 2.
  */
-static inline int hmem_is_aligned(uintptr_t v, uintptr_t align) {
+static inline bool hmem_is_aligned(uintptr_t v, uintptr_t align) {
     HMEM_CHECK_ARGS(hmem_is_pow2(align), 0);
     return (v & (align - 1)) == 0;
 }

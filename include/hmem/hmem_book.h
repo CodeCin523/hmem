@@ -7,6 +7,7 @@ extern "C" {
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 
 typedef struct hmem_page hmem_page_t;
@@ -23,14 +24,14 @@ struct hmem_book {
 };
 
 
-void hmem_setup_page(hmem_page_t *page, void *pool, size_t capacity);
+bool hmem_setup_page(hmem_page_t *page, void *pool, size_t capacity);
 void hmem_teardown_page(hmem_page_t *page);
 
-void hmem_setup_book(hmem_book_t *book, uint8_t capacity);
+bool hmem_setup_book(hmem_book_t *book, uint8_t capacity);
 void hmem_teardown_book(hmem_book_t *book);
 
 void hmem_book_push(hmem_book_t *book, hmem_page_t *page);
-void hmem_book_pop(hmem_book_t *book, hmem_page_t *outPage);
+bool hmem_book_pop(hmem_book_t *book, hmem_page_t *outPage);
 
 
 #ifdef __cplusplus
@@ -40,6 +41,7 @@ void hmem_book_pop(hmem_book_t *book, hmem_page_t *outPage);
 #endif /* HMEM_BOOK_H */
 
 
+#define HMEM_IMPLEMENTATION
 #if defined(HMEM_IMPLEMENTATION) && !defined(HMEM_BOOK_IMPLEMENTATION)
 #define HMEM_BOOK_IMPLEMENTATION
 
@@ -52,11 +54,13 @@ extern "C" {
 #include <stdlib.h>
 
 
-void hmem_setup_page(hmem_page_t *page, void *pool, size_t capacity) {
-    HMEM_CHECK_ARGS(page && pool && capacity != 0, /*void*/);
+bool hmem_setup_page(hmem_page_t *page, void *pool, size_t capacity) {
+    HMEM_CHECK_ARGS(page && pool && capacity != 0, false);
 
     page->pool = pool;
     page->capacity = capacity;
+
+    return true;
 }
 void hmem_teardown_page(hmem_page_t *page) {
     HMEM_CHECK_ARGS(page, /*void*/);
@@ -65,14 +69,16 @@ void hmem_teardown_page(hmem_page_t *page) {
     page->capacity = 0;
 }
 
-void hmem_setup_book(hmem_book_t *book, uint8_t capacity) {
-    HMEM_CHECK_ARGS(book && capacity != 0, /*void*/);
+bool hmem_setup_book(hmem_book_t *book, uint8_t capacity) {
+    HMEM_CHECK_ARGS(book && capacity != 0, false);
 
     book->pages = calloc(capacity, sizeof(hmem_page_t));
-    HMEM_CHECK_ALLOC(book->pages, /*void*/);
+    HMEM_CHECK_ALLOC(book->pages, false);
 
     book->current = 0;
     book->capacity = capacity;
+
+    return true;
 }
 void hmem_teardown_book(hmem_book_t *book) {
     HMEM_CHECK_ARGS(book, /*void*/);
@@ -105,15 +111,17 @@ void hmem_book_push(hmem_book_t *book, hmem_page_t *page) {
 
     book->pages[book->current++] = *page;
 }
-void hmem_book_pop(hmem_book_t *book, hmem_page_t *outPage) {
-    HMEM_CHECK_ARGS(book, /*void*/);
+bool hmem_book_pop(hmem_book_t *book, hmem_page_t *outPage) {
+    HMEM_CHECK_ARGS(book, false);
     
     if(book->current > 0) {
         --book->current;
 
         if(outPage)
             *outPage = book->pages[book->current];
+        return true;
     }
+    return false;
 }
 
 void *hmem_book_resolve(hmem_book_t *book, uintptr_t offset) {

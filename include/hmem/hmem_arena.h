@@ -17,7 +17,7 @@ struct hmem_arena {
 };
 
 
-void hmem_setup_arena(hmem_arena_t *arena, hmem_book_t *book);
+bool hmem_setup_arena(hmem_arena_t *arena, hmem_book_t *book);
 void hmem_teardown_arena(hmem_arena_t *arena);
 
 void *hmem_arena_alloc(hmem_arena_t *arena, size_t size, size_t align);
@@ -41,12 +41,14 @@ extern "C" {
 #include <hmem/utils/hmem_align.h>
 
 
-void hmem_setup_arena(hmem_arena_t *arena, hmem_book_t *book) {
-    HMEM_CHECK_ARGS(arena && book, /*void*/);
+bool hmem_setup_arena(hmem_arena_t *arena, hmem_book_t *book) {
+    HMEM_CHECK_ARGS(arena && book, false);
 
     arena->book = book;
     arena->page_offset = 0;
     arena->page_idx = 0;
+
+    return true;
 }
 void hmem_teardown_arena(hmem_arena_t *arena) {
     HMEM_CHECK_ARGS(arena, /*void*/);
