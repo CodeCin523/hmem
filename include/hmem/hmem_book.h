@@ -51,10 +51,11 @@ extern "C" {
 #include <hmem/utils/hmem_align.h>
 
 #include <stdlib.h>
+#include <stdalign.h>
 
 
 bool hmem_setup_page(hmem_page_t *page, void *pool, size_t capacity) {
-    HMEM_CHECK_ARGS(page && pool && capacity != 0, false);
+    HMEM_CHECK_ARGS(page && pool && hmem_is_aligned((uintptr_t) pool, alignof(max_align_t)) && capacity != 0, false);
 
     page->pool = pool;
     page->capacity = capacity;

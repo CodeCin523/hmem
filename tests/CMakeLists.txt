@@ -8,6 +8,15 @@ target_link_libraries(
 )
 
 add_executable(
+    test_hmem_block
+    test_hmem_block.c
+)
+target_link_libraries(
+    test_hmem_block PRIVATE
+    hmem::hmem
+)
+
+add_executable(
     test_hmem_book
     test_hmem_book.c
 )
