@@ -39,7 +39,6 @@ void hmem_block_free_single(hmem_block_t *block, void *addr);
 #endif /* HMEM_BLOCK_H */
 
 
-#define HMEM_IMPLEMENTATION
 #if defined(HMEM_IMPLEMENTATION) && !defined(HMEM_BLOCK_IMPLEMENTATION)
 #define HMEM_BLOCK_IMPLEMENTATION
 
