@@ -33,6 +33,8 @@ void hmem_teardown_book(hmem_book_t *book);
 bool hmem_book_push(hmem_book_t *book, hmem_page_t *page);
 bool hmem_book_pop(hmem_book_t *book, hmem_page_t *outPage);
 
+bool hmem_book_contains(hmem_book_t *book, void *ptr);
+
 
 #ifdef __cplusplus
 }
@@ -124,6 +126,25 @@ bool hmem_book_pop(hmem_book_t *book, hmem_page_t *outPage) {
     }
     return false;
 }
+
+bool hmem_book_contains(hmem_book_t *book, void *ptr) {
+    HMEM_CHECK_ARGS(book, false);
+
+    uintptr_t addr = (uintptr_t)ptr;
+
+    for(uint8_t i = 0; i < book->current; ++i) {
+        hmem_page_t *page = &book->pages[i];
+
+        uintptr_t start = (uintptr_t)page->pool;
+        uintptr_t end   = start + page->capacity;
+
+        if(addr >= start && addr < end)
+            return true;
+    }
+
+    return false;
+}
+
 
 void *hmem_book_resolve(hmem_book_t *book, uintptr_t offset) {
     for(uint8_t i = 0; i < book->current; ++i) {
